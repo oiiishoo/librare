@@ -24,10 +24,26 @@ public:
 	}
 };
 template<typename T>
+class abnode {
+public:
+	char hasval : 1, typ : 1;
+	char unused[7];
+	int items;
+	T val;
+};
+
+abnode<char> d;
+
+template<typename T>
 class Trie {
 	char lay[256];
 	char* darray;
-	std::list<char*> heaps;
+	std::list<str> heaps;
+
+	void clearchain(str fromnode) {
+
+	}
+
 	/*iterative
 	struct tnod
 	int items
@@ -42,16 +58,43 @@ class Trie {
 		if (!res)return 0;
 		tnod t(0, 0);
 		*(tnod*)(res) = t;
-		*((int*)res + sizeof(tnod)) = 0;
+		*(int*)(res + sizeof(tnod)) = 0;
+
+
+		heaps.emplace_back(res);
 		return res;
 	}
-	void Iset(char key, str iterativeNode, str value) {
-		if (!iterativeNode)return;
+	void Isetval(str iterativeNode, T value) {
+		if ((!iterativeNode)|| ((*(tnod*)(iterativeNode)).typ))return;
+		*((tnod*)(iterativeNode)) = tnod(1, 0);
+		*((szt*)(iterativeNode + sizeof(tnod))) += 1;
+		*(T*)(iterativeNode + sizeof(tnod) + 4)) = value;
+		
+	}
+	bool Ipopval(str iterativeNode, T& value) {
 
-		*((szt*)iterativeNode + sizeof(tnod)) += 1;
+	}
+	bool Ihasval(str iterativeNode,T&value) {
+		if ((!iterativeNode))return 0;
+		if (((*(tnod*)(iterativeNode)).typ))return 0;
+		tnod t = *(tnod*)iterativeNode;
+		if (t.hasval) {
+			if (buffer) {
+				buffer = t;
+			}
+			return 1;
+		}
+		return 0;
+	}
+	void IsetPTR(char key,str iterativeNode) {
+		if (!iterativeNode)return;
+		if (((*(tnod*)(iterativeNode)).typ))return;
+		//todo realloc
 	}
 	void Ifree(char key, str iterativeNode) {
 		if (!iterativeNode)return;
+		if (((*(tnod*)(iterativeNode)).typ))return;
+		//todo look all in path
 
 	}
 	/*static no keys / uses lay/offset layout
@@ -66,9 +109,8 @@ class Trie {
 		str res = strc malloc(elementsMem + sizeof(tnod) + 4);
 		if (!res)return 0;
 		tnod t(0, 1);
-		t.
 		*(tnod*)(res) = t;
-		*((int*)staticnode) = items;
+		*(int*)(res+sizeof(tnod)) = items;
 		str core = strc(res + 4 + sizeof(tnod)+sizeof(T));
 		for (size_t i = 0; i < items; i++)
 		{
@@ -77,28 +119,33 @@ class Trie {
 		heaps.emplace_back(res);
 		return res;
 	}
-	void SsetVal(str staticnode,T val) {
-		if (!staticnode)return;
-		*(tnod*)(staticnode+4+ sizeof(tnod)) = val;
+	void Ssetval(str staticnode,T val) {
+		if ((!staticnode))return;
+		if ((!(*(tnod*)(staticnode)).typ))return;
+		*(tnod*)(staticnode) = tnod(1,1);
+		*((T*)(staticnode + sizeof(tnod) + 4)) = val;
 	}
 	void SsetPTR(int offset, str staticnode, str ptr) {
 		if ((offset < 0) || (offset > 255) || (!staticnode))return;
-		if (offset > (*((int*)(staticnode+sizeof(tnod)))-1))return;
+		if ((!(*(tnod*)(staticnode)).typ))return 0;
+		if (offset > ((*(int*)(staticnode+sizeof(tnod)))-1))return;
 		( (str*)(staticnode + 4 + sizeof(tnod)+sizeof(T)) )[offset] = ptr;
 	}
-	bool Shasval(str staticnode,T*buffer=0) {
-		if (!staticnode)return;
+	bool Shasval(str staticnode, T& buffer = 0) {
+		if ((!staticnode))return 0;
+		if ((!(*(tnod*)(staticnode)).typ))return 0;
 		tnod t= *(tnod*)staticnode;
 		if (t.hasval) {
 			if (buffer) {
-				*buffer = t;
+				buffer = t;
 			}
 			return 1;
 		}
 		return 0;
 	}
 	void Sfree(str staticnode) {
-		if (!staticnode)return;
+		if ((!staticnode))return;
+		if ((!(*(tnod*)(staticnode)).typ))return 0;
 		int items=*(int*)(staticnode+sizeof(tnod));
 		if (!items) {
 			free(staticnode);
@@ -109,26 +156,42 @@ class Trie {
 		for (size_t i = 0; i < items; i++)
 		{
 			if (core[i]) {
-				*(int*)(core + sizeof(tnod))
-				if()
+				*(int*)(core + sizeof(tnod));
+				if () {
+
+				}
 				free(core[i]);
 			}
 		}
 	}
+	bool findBykey(str key) {
 
+	}
 public:
 	size_t size;
 	int uniq_symbols;
-	unsigned short maxLength;
-	//делать через хранение указателей
+	unsigned short treedepth;
+	Trie& put() {
 
-	Trie(str allowed_symbols,short treelength) {
-		maxLength = treelength;
-		const int evil=256;
-		for( char* _:heaps)
+		return *this;
+	}
+	Trie& clear() {
+		if (!darray)return;
+		heaps.clear();
+		free(darray);
+		for (size_t i = 0; i < 256; i++)
 		{
-			free(_);
+			lay[i] = 0;
 		}
+		return *this;
+	}
+	~Trie() {
+		clear();
+	}
+	Trie(str allowed_symbols,short treelength) {
+		treedepth = treelength;
+		const int evil=256;
+		clear();
 		if (!allowed_symbols) {
 			//binary fill
 			for (szt i = 0; i < evil; i++)
@@ -165,28 +228,17 @@ public:
 		
 	}
 	//linear search
-	bool has(T*buf) {
+	bool has(T&buf) {
 
 	}
-	T& operator[](cstr _cstr) {
+	T operator[](cstr _cstr) {
 		findBykey(_cstr);
 		//return
+
 	}
-	T& operator[](str _str) {
+	T operator[](str _str) {
 		findBykey(_str);
 		//return 
-	}
-
-	bool findBykey(str _str) {
-		if (_str) {
-			
-		}
-		return 0;
-	}
-
-	bool findBykey(cstr _cstr) {
-
-		return findBykey(strc _cstr);
 	}
 
 };
