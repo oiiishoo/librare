@@ -10,3 +10,5 @@ Custom datastructures and personal utilities c/c++ implementation
 Добавка компонента udpcomponent для более простой работы клиента и сервера на основе udp winsock.
 
 Залив timerpool компонента на основе busywait windows QPC.
+
+Залив компонента tcp, упрощает инит и юз
