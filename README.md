@@ -12,3 +12,5 @@ Custom datastructures and personal utilities c/c++ implementation
 Залив timerpool компонента на основе busywait windows QPC.
 
 Залив компонента tcp, упрощает инит и юз
+
+Идея о создании Trie, была отброшена в связи с  не релевантностью тяжёлой адаптивной реализации
